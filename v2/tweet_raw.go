@@ -60,6 +60,7 @@ type tweetraw struct {
 	Tweet    *TweetObj         `json:"data"`
 	Includes *TweetRawIncludes `json:"includes"`
 	Errors   []*ErrorObj       `json:"errors"`
+	MatchingRules []*TweetSearchStreamRuleEntity   `json:"matching_rules,omitempty"`
 }
 
 // TweetRaw is the raw response from the tweet lookup endpoint
@@ -67,6 +68,7 @@ type TweetRaw struct {
 	Tweets       []*TweetObj       `json:"data"`
 	Includes     *TweetRawIncludes `json:"includes,omitempty"`
 	Errors       []*ErrorObj       `json:"errors,omitempty"`
+	MatchingRules []*TweetSearchStreamRuleEntity   `json:"matching_rules,omitempty"`
 	dictionaries map[string]*TweetDictionary
 }
 
@@ -84,6 +86,38 @@ func (t *TweetRaw) TweetDictionaries() map[string]*TweetDictionary {
 }
 
 // TweetRawIncludes contains any additional information from the tweet callout
+
+// GetMatchingRuleTags returns the tags of matching rules for easy access
+func (t *TweetRaw) GetMatchingRuleTags() []string {
+	if len(t.MatchingRules) == 0 {
+		return nil
+	}
+
+	tags := make([]string, 0, len(t.MatchingRules))
+	for _, rule := range t.MatchingRules {
+		if rule.Tag != "" {
+			tags = append(tags, rule.Tag)
+		}
+	}
+	return tags
+}
+
+// GetMatchingRuleIDs returns the IDs of matching rules for easy access
+func (t *TweetRaw) GetMatchingRuleIDs() []string {
+	if len(t.MatchingRules) == 0 {
+		return nil
+	}
+
+	ids := make([]string, 0, len(t.MatchingRules))
+	for _, rule := range t.MatchingRules {
+		if string(rule.ID) != "" {
+			ids = append(ids, string(rule.ID))
+		}
+	}
+	return ids
+}
+
+
 type TweetRawIncludes struct {
 	Tweets          []*TweetObj `json:"tweets,omitempty"`
 	Users           []*UserObj  `json:"users,omitempty"`
